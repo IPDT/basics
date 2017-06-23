@@ -1,9 +1,12 @@
 # -*- coding: utf-8 -*-
 """
-find duplicated files with md5
+find duplicated files by comparing MD5
+need one parameter: the folder path
+1. firstly check size
+2. check md5 when size equals
 Created on Fri Jun 23 16:17:00 2017
 
-@author: aw
+@author: aaran wang
 """
 import hashlib
 import os
@@ -11,41 +14,46 @@ from time import clock as now
 
 
 def getmd5(filename):
-
+    """
+    Get MD5 of file
+    :param filename: the full path of the file
+    :return: MD5 of file
+    """
     file_txt = open(filename,'rb').read()
     m = hashlib.md5(file_txt)
     return m.hexdigest()
 
 
 def main():
+    # get folder
     path = input("path: ")
     all_md5 = {}
-    all_size = {}
-    total_file = 0
-    total_delete = 0
-    start = now()
+    all_sizes = {}  # file size dictionary: {file_size, [file_path, file_md5]}
+    total_files = 0  # count of total files
+    total_duplicates = 0  # total number of duplicated files
+    time_start = now()
     for file in os.listdir(path):
-        total_file += 1
-        real_path=os.path.join(path,file)
-        if os.path.isfile(real_path):
-            size = os.stat(real_path).st_size
-            name_and_md5=[real_path,'']
-            if size in all_size.keys():
-                new_md5 = getmd5(real_path)
-                if all_size[size][1] == '':
-                    all_size[size][1]=getmd5(all_size[size][0])
-                    if new_md5 in all_size[size]:
-                        print(file, ' duplicated with ', os.path.basename(all_size[size][0]))
-                        total_delete += 1
+        total_files += 1
+        real_file_path = os.path.join(path,file)
+        if os.path.isfile(real_file_path):
+            file_size = os.stat(real_file_path).st_size # calc file size
+            name_and_md5 = [real_file_path, '']
+            if file_size in all_sizes.keys():  # found equal sized file, need to compare md5
+                new_md5 = getmd5(real_file_path)  # calc new file's md5
+                if all_sizes[file_size][1] == '':  # old file's md5 is initial
+                    all_sizes[file_size][1] = getmd5(all_sizes[file_size][0])  # calc old file's md5
+                if new_md5 in all_sizes[file_size]:  # found equal md5
+                    print(file, ' duplicated with ', os.path.basename(all_sizes[file_size][0]))
+                    total_duplicates += 1
                 else:
-                    all_size[size].append(new_md5)
-            else:
-                all_size[size]=name_and_md5
-    end = now()
-    time_last = end - start
-    print('total files：',total_file)
-    print('duplicated files：',total_delete)
-    print('elapsed time：',time_last,'秒')
+                    all_sizes[file_size].append(new_md5)  # append new entry with new md5
+            else:  # no equal sized file found
+                all_sizes[file_size] = name_and_md5  # insert new entry without md5
+    time_end = now()
+    time_last = time_end - time_start
+    print('total files：', total_files)
+    print('duplicated files：', total_duplicates)
+    print('elapsed time：', time_last, 'seconds')
 
 if __name__ == '__main__':
     main()
