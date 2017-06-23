@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 """
-remove duplicated files with opencv
+find duplicated files with md5
 Created on Fri Jun 23 16:17:00 2017
 
 @author: aw
