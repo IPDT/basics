@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 """
+compare 2 image files with opencv
 Created on Fri Jun 23 16:17:00 2017
 
 @author: aw
