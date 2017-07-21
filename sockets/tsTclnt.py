@@ -3,6 +3,8 @@
 from socket import *
 from time import ctime
 
+#change HOST to your remote HOST ip for test
+#HOST = 'localhost'
 HOST = '10.58.179.98'
 PORT = 21567
 BUFSIZ = 1024
